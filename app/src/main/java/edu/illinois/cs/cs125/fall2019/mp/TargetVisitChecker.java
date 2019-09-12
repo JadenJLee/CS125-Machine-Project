@@ -38,11 +38,24 @@ public class TargetVisitChecker {
      * @param range maximum distance to target, in meters
      * @return the index of a target within the range that is not on the path, or -1 if no such target exists
      */
+
     public static int getTargetWithinRange(final double[] latitudes, final double[] longitudes, final int[] path,
                                            final double currentLatitude, final double currentLongitude,
                                            final int range) {
+
         // HINT: To find the distance in meters between two locations, use a provided helper function:
         // LatLngUtils.distance(oneLatitude, oneLongitude, otherLatitude, otherLongitude)
+        for (int i = 0; i < path.length; i++) {
+            if (LatLngUtils.distance(latitudes[i], longitudes[i], currentLatitude, currentLongitude) <= range) {
+                for (int j = 0; j < path.length; j++) {
+                    if (i == path[j]) {
+                        break;
+                    } else if (path[j] == -1) {
+                        return i;
+                    }
+                }
+            }
+        }
         return -1;
     }
 
@@ -86,6 +99,14 @@ public class TargetVisitChecker {
      * @return the index in the path array that was updated, or -1 if the path array was full
      */
     public static int visitTarget(final int[] path, final int targetIndex) {
+
+        for (int i = 0; i < path.length; i++) {
+            if (path[i] == -1) {
+                path[i] = targetIndex;
+                return i;
+            }
+        }
+
         return -1;
     }
 
