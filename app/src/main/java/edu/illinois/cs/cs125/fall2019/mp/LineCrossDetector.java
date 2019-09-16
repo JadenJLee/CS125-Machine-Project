@@ -1,5 +1,7 @@
 package edu.illinois.cs.cs125.fall2019.mp;
 
+import java.util.stream.DoubleStream;
+
 /**
  * Holds a method to determine whether two lines cross.
  * <p>
@@ -36,10 +38,10 @@ public class LineCrossDetector {
                                      final double firstEndLat, final double firstEndLng,
                                      final double secondStartLat, final double secondStartLng,
                                      final double secondEndLat, final double secondEndLng) {
-        if(LatLngUtils.same(firstStartLat, firstStartLng, secondStartLat, secondStartLng)
+        if (LatLngUtils.same(firstStartLat, firstStartLng, secondStartLat, secondStartLng)
                 || LatLngUtils.same(firstStartLat, firstStartLng, secondEndLat, secondEndLng)
                 || LatLngUtils.same(firstEndLat, firstEndLng, secondStartLat, secondStartLng)
-                || LatLngUtils.same(firstEndLat, firstEndLng, secondEndLat, secondEndLng)){
+                || LatLngUtils.same(firstEndLat, firstEndLng, secondEndLat, secondEndLng)) {
             // The lines are just sharing endpoints, not crossing each other
             return false;
         }
@@ -70,7 +72,8 @@ public class LineCrossDetector {
         double firstIntercept = firstStartLat - firstSlope * firstStartLng;
         double secondIntercept = secondStartLat - secondSlope * secondStartLng;
         double intersectionX = -(firstIntercept - secondIntercept) / (firstSlope - secondSlope);
-        if (LatLngUtils.same(intersectionX, firstStartLng) || LatLngUtils.same(intersectionX, firstEndLng) || LatLngUtils.same(intersectionX, secondStartLng) || LatLngUtils.same(intersectionX, secondEndLng)) {
+        if (DoubleStream.of(firstStartLng, firstEndLng, secondStartLng, secondEndLng).anyMatch(v ->
+                LatLngUtils.same(intersectionX, v))) {
             // Endpoint of one line is in the middle of the other line
             return true;
         }
@@ -92,8 +95,9 @@ public class LineCrossDetector {
      * @param lineEndLng the longitude of that other endpoin
      * @return whether the lines cross
      */
+
     private static boolean lineCrossesVertical(final double verticalStartLat, final double verticalEndLat,
-                                               double verticalLng,
+                                               final double verticalLng,
                                                final double lineStartLat, final double lineStartLng,
                                                final double lineEndLat, final double lineEndLng) {
         if (Math.max(lineStartLng, lineEndLng) < verticalLng
