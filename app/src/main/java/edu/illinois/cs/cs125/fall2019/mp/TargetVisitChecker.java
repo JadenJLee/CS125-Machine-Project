@@ -86,6 +86,28 @@ public class TargetVisitChecker {
         // HINT: To determine whether two lines cross, use a provided helper function:
         // LineCrossDetector.linesCross(oneStartLat, oneStartLng, oneEndLat, oneEndLng,
         //                              otherStartLat, otherStartLng, otherEndLat, otherEndLng)
+        int constantTarget = 0;
+
+        if (path[0] == -1) {
+            return true;
+        }
+        if (path[1] == -1) {
+            return true;
+        }
+        for (int j = 1; j < path.length; j++) {
+            if (path[j] == -1) {
+                constantTarget = j - 1;
+                break;
+            }
+        }
+        for (int i = constantTarget; i >= 1; i--) {
+            if (LineCrossDetector.linesCross(latitudes[tryVisit], longitudes[tryVisit],
+                    latitudes[path[constantTarget]], longitudes[path[constantTarget]],
+                    latitudes[path[i]], longitudes[path[i]],
+                    latitudes[path[i - 1]], longitudes[path[i - 1]])) {
+                return false;
+            }
+        }
         return true;
     }
 
