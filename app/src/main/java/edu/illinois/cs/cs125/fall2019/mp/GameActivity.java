@@ -200,18 +200,15 @@ public final class GameActivity extends AppCompatActivity {
             int indexOfTarget = TargetVisitChecker.getTargetWithinRange(targetLats, targetLngs,
                     path, latitude, longitude, PROXIMITY_THRESHOLD);
             if (TargetVisitChecker.checkSnakeRule(targetLats, targetLngs, path, indexOfTarget)) {
-                TargetVisitChecker.visitTarget(path, indexOfTarget);
-                changeMarkerColor(targetLats[indexOfTarget], targetLngs[indexOfTarget],
-                        CAPTURED_MARKER_HUE);
-                int indexOfone = 0;
-                for (int j = 0; j < path.length; j++) {
-                    if (path[j] == -1) {
-                        indexOfone = j;
-                    }
+                int x = TargetVisitChecker.visitTarget(path, indexOfTarget);
+                if (x != -1) {
+                    changeMarkerColor(targetLats[indexOfTarget], targetLngs[indexOfTarget],
+                            CAPTURED_MARKER_HUE);
                 }
-                int previousTarget = indexOfone - 1;
-                addLine(targetLats[previousTarget], targetLngs[previousTarget],
-                        targetLats[indexOfTarget], targetLngs[indexOfTarget], PLAYER_COLOR);
+                if (x >= 1) {
+                    addLine(targetLats[path[x - 1]], targetLngs[path[x - 1]],
+                            targetLats[path[x]], targetLngs[path[x]], PLAYER_COLOR);
+                }
             }
         }
         // This function is responsible for updating the game state and map according to the user's movements
