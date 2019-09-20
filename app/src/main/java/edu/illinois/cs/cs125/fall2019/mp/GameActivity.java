@@ -45,7 +45,7 @@ public final class GameActivity extends AppCompatActivity {
     /** The radial location accuracy required to send a location update. */
     private static final float REQUIRED_LOCATION_ACCURACY = 28f;
 
-    /** How close the user has to be (in meters) to a target to capture it. */
+    /** How close the user onhas to be (in meters) to a target to capture it. */
     private static final int PROXIMITY_THRESHOLD = 20;
 
     /** Hue of the markers showing captured target locations.
@@ -178,6 +178,12 @@ public final class GameActivity extends AppCompatActivity {
 
         // Use the provided placeMarker function to add a marker at every target's location
         // HINT: onCreate initializes the relevant arrays (targetLats, targetLngs, path) for you
+        for (int i = 0; i < path.length; i++) {
+            double targetLatitudes = targetLats[i];
+            double targetLongitudes = targetLngs[i];
+            placeMarker(targetLatitudes, targetLongitudes);
+        }
+
     }
 
     /**
@@ -189,6 +195,25 @@ public final class GameActivity extends AppCompatActivity {
      */
     @VisibleForTesting // Actually just visible for documentation - not called directly by test suites
     public void updateLocation(final double latitude, final double longitude) {
+        if (TargetVisitChecker.getTargetWithinRange(targetLats, targetLngs,
+                path, latitude, longitude, PROXIMITY_THRESHOLD) != -1) {
+            int indexOfTarget = TargetVisitChecker.getTargetWithinRange(targetLats, targetLngs,
+                    path, latitude, longitude, PROXIMITY_THRESHOLD);
+            if (TargetVisitChecker.checkSnakeRule(targetLats, targetLngs, path, indexOfTarget)) {
+                TargetVisitChecker.visitTarget(path, indexOfTarget);
+                changeMarkerColor(targetLats[indexOfTarget], targetLngs[indexOfTarget],
+                        CAPTURED_MARKER_HUE);
+                int indexOfone = 0;
+                for (int j = 0; j < path.length; j++) {
+                    if (path[j] == -1) {
+                        indexOfone = j;
+                    }
+                }
+                int previousTarget = indexOfone - 1;
+                addLine(targetLats[previousTarget], targetLngs[previousTarget],
+                        targetLats[indexOfTarget], targetLngs[indexOfTarget], PLAYER_COLOR);
+            }
+        }
         // This function is responsible for updating the game state and map according to the user's movements
 
         // HINT: To operate on the game state, use the three methods you implemented in TargetVisitChecker
