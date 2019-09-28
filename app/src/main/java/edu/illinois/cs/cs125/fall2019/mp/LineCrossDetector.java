@@ -24,14 +24,15 @@ public class LineCrossDetector {
      * This ignores the roundness of the earth, but it's undetectable at reasonable scales of the game.
      * <p>
      * All parameters are assumed to be valid: both lines have positive length.
-     * @param firstStartLat the latitude of the start of one line
-     * @param firstStartLng the longitude of the start of that line
-     * @param firstEndLat the latitude of the end of that line
-     * @param firstEndLng the longitude of the end of that line
+     *
+     * @param firstStartLat  the latitude of the start of one line
+     * @param firstStartLng  the longitude of the start of that line
+     * @param firstEndLat    the latitude of the end of that line
+     * @param firstEndLng    the longitude of the end of that line
      * @param secondStartLat the latitude of the start of another line
      * @param secondStartLng the longitude of the start of that other line
-     * @param secondEndLat the latitude of the end of that other line
-     * @param secondEndLng the longitude of the end of that other line
+     * @param secondEndLat   the latitude of the end of that other line
+     * @param secondEndLng   the longitude of the end of that other line
      * @return whether the two lines cross
      */
     public static boolean linesCross(final double firstStartLat, final double firstStartLng,
@@ -86,13 +87,14 @@ public class LineCrossDetector {
 
     /**
      * Determines if a non-vertical line crosses a vertical line.
+     *
      * @param verticalStartLat the latitude of one endpoint of the vertical line
-     * @param verticalEndLat the latitude of the other endpoint of the vertical line
-     * @param verticalLng the longitude of the vertical line
-     * @param lineStartLat the latitude of one endpoint of the non-vertical line
-     * @param lineStartLng the longitude of that endpoint
-     * @param lineEndLat the latitude of the other endpoint of the line
-     * @param lineEndLng the longitude of that other endpoin
+     * @param verticalEndLat   the latitude of the other endpoint of the vertical line
+     * @param verticalLng      the longitude of the vertical line
+     * @param lineStartLat     the latitude of one endpoint of the non-vertical line
+     * @param lineStartLng     the longitude of that endpoint
+     * @param lineEndLat       the latitude of the other endpoint of the line
+     * @param lineEndLng       the longitude of that other endpoin
      * @return whether the lines cross
      */
 
@@ -118,10 +120,11 @@ public class LineCrossDetector {
 
     /**
      * Determines the slope of a non-vertical line.
+     *
      * @param startLat the latitude of one endpoint of the line
      * @param startLng the longitude of that endpoint
-     * @param endLat the latitude of the other endpoint of the line
-     * @param endLng the longitude of that other endpoint
+     * @param endLat   the latitude of the other endpoint of the line
+     * @param endLng   the longitude of that other endpoint
      * @return the slope, treating longitude as X and latitude as Y
      */
     private static double lineSlope(final double startLat, final double startLng,

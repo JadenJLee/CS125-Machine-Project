@@ -1,38 +1,46 @@
 package edu.illinois.cs.cs125.fall2019.mp;
 
-public class AreaDivider {
+/**
+ * Divides a rectangular area into identically sized, roughly square cells.
+ */
+public class AreaDivider extends java.lang.Object {
     /**
-     * @param sNorth is the latitude of the north boundary
+     * north is the latitude of the north boundary.
      */
-    private double sNorth;
+    private double north;
     /**
-     * @param sEast is the longitude of the east boundary
+     * east is the longitude of the east boundary.
      */
-    private double sEast;
+    private double east;
     /**
-     * @param sSouth is the latitude of the south boundary
+     * south is the latitude of the south boundary.
      */
-    private double sSouth;
+    private double south;
     /**
-     * @param sWest is the longitude of the west boundary
+     * west is the longitude of the west boundary.
      */
-    private double sWest;
+    private double west;
     /**
-     * @param sCellSize is the requested side length of each cell in meters.
+     * cellSize is the requested side length of each cell in meters.
      */
-    private double sCellSize;
+    private double cellSize;
 
-        public AreaDivider(final double east,
-                           final double north,
-                           final double south,
-                           final double west,
-                           final double cellSize) {
-            north = sNorth;
-            east = sEast;
-            south = sSouth;
-            west = sWest;
-            cellSize = sCellSize;
+    /**
+     * @param setNorth    sets the latitude of the north boundary
+     * @param setEast     sets the longitude of the east boundary
+     * @param setSouth    latitude of the south boundary
+     * @param setWest     longitude of the west boundary
+     * @param setCellSize the requested side length of each cell, in meters
+     *                    creates an areaDivider for an area
+     */
 
+    AreaDivider(final double setNorth, final double setEast, final double setSouth,
+                final double setWest, final double setCellSize) {
+        north = setNorth;
+        east = setEast;
+        south = setSouth;
+        west = setWest;
+        cellSize = setCellSize;
     }
 
     /**
@@ -41,8 +49,60 @@ public class AreaDivider {
      * @return the boundaries of the cell
      */
     public com.google.android.gms.maps.model.LatLngBounds getCellBounds(final int x, final int y) {
-            return null;
+        return null;
     }
 
+    /**
+     * getXCells gets the number of cells between the west and east boundaries.
+     *
+     * @return the number of Cells in the X direction
+     */
+    public int getXCells() {
+
+        double distance = (LatLngUtils.distance(0, west, 0, east));
+        System.out.println(distance);
+        double numberOfCells = distance / cellSize;
+        System.out.println(cellSize);
+        // return (int) java.lang.Math.ceil(numberOfCells);
+        return 0;
+    }
+
+    /**
+     * @param location gets the x coordinate of the cell containing of the cell containing the specified location
+     * @return the X coordinate of the cell containing the specified latitude-longitude point
+     */
+    public int getXCoordinate(final com.google.android.gms.maps.model.LatLng location) {
+        return 0;
+    }
+
+    /**
+     * getYCells Gets the number of cells between the south and north boundaries.
+     *
+     * @return the number of cells in the Y direction
+     */
+    public int getYCells() {
+        double distance = (LatLngUtils.distance(north, 0, south, 0));
+        System.out.println(distance);
+        double numberOfCells = distance / cellSize;
+        System.out.println(cellSize);
+        // return (int) java.lang.Math.ceil(numberOfCells);
+        return 0;
+    }
+
+    /**
+     * @param location the location
+     * @return the Y coordinate of the cell containing the specified latitude-longitude point
+     */
+    public int getYCoordinate(final com.google.android.gms.maps.model.LatLng location) {
+        return 0;
+    }
+
+    /**
+     * Draws the grid to a map using solid black polylines.
+     *
+     * @param map the Google map to draw on
+     */
+    public void renderGrid(final com.google.android.gms.maps.GoogleMap map) {
+    }
 
 }

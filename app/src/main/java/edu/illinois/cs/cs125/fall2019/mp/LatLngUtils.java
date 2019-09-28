@@ -9,13 +9,16 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public final class LatLngUtils {
 
-    /** Tolerance for LatLng-related double comparisons. */
+    /**
+     * Tolerance for LatLng-related double comparisons.
+     */
     private static final double COMPARE_EPSILON = 0.0000001;
 
     /**
      * Computes the distance between two points.
-     * @param oneLat the latitude of one point
-     * @param oneLng the longitude of that point
+     *
+     * @param oneLat     the latitude of one point
+     * @param oneLng     the longitude of that point
      * @param anotherLat the latitude of another point
      * @param anotherLng the longitude of that other point
      * @return the distance between the two points, in meters
@@ -27,7 +30,8 @@ public final class LatLngUtils {
 
     /**
      * Computes the distance between two points represented as LatLngs.
-     * @param one one latitude-longitude coordinate pair
+     *
+     * @param one     one latitude-longitude coordinate pair
      * @param another the other latitude-longitude coordinate pair
      * @return the distance between the two points, in meters
      */
@@ -43,7 +47,8 @@ public final class LatLngUtils {
 
     /**
      * Determines whether two location-related coordinates are similar enough to be considered the same.
-     * @param one a coordinate of one point
+     *
+     * @param one     a coordinate of one point
      * @param another the corresponding coordinate of the other point
      * @return whether they're effectively the same coordinate
      */
@@ -53,8 +58,9 @@ public final class LatLngUtils {
 
     /**
      * Determines whether two points are similar enough to be considered the same spot.
-     * @param oneLat the latitude of one point
-     * @param oneLng the longitude of that point
+     *
+     * @param oneLat     the latitude of one point
+     * @param oneLng     the longitude of that point
      * @param anotherLat the latitude of another point
      * @param anotherLng the longitude of that other point
      * @return whether they're the same place
@@ -66,7 +72,8 @@ public final class LatLngUtils {
 
     /**
      * Determines whether two points are similar enough to be considered the same spot.
-     * @param one one point
+     *
+     * @param one     one point
      * @param another the other point
      * @return whether they're the same place
      */

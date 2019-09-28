@@ -26,9 +26,10 @@ public class WekaTrainer {
      * classes or any methods that rely on them. When running inside Android, it is not possible
      * to access the development computer's filesystem. This method should only be used to train the
      * model which gets baked into the app; it must not be called from app code.
+     *
      * @param args command-line arguments (unused)
      * @throws java.io.IOException if something goes wrong loading the JSON file or saving the model
-     * @throws Exception if something goes wrong serializing the classifier
+     * @throws Exception           if something goes wrong serializing the classifier
      */
     public static void main(final String[] args) throws Exception {
         // Load the training paths from JSON

@@ -2,7 +2,9 @@ package edu.illinois.cs.cs125.fall2019.mp;
 
 import android.content.Intent;
 import android.graphics.Point;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.widget.Button;
@@ -20,11 +22,14 @@ public final class NewGameActivity extends AppCompatActivity {
 
     // This activity doesn't do much at first - it'll be worked on in Checkpoints 1 and 3
 
-    /** The Google Maps view used to set the area for area mode. Null until getMapAsync finishes. */
+    /**
+     * The Google Maps view used to set the area for area mode. Null until getMapAsync finishes.
+     */
     private GoogleMap areaMap;
 
     /**
      * Called by the Android system when the activity is created.
+     *
      * @param savedInstanceState state from the previously terminated instance (unused)
      */
     @Override
@@ -82,6 +87,7 @@ public final class NewGameActivity extends AppCompatActivity {
      * <p>
      * You don't need to alter or understand this function, but you will want to use it when
      * you add another map control in Checkpoint 3.
+     *
      * @param map the map to center
      */
     private void centerMap(final GoogleMap map) {
@@ -117,5 +123,4 @@ public final class NewGameActivity extends AppCompatActivity {
         // Complete this function so that it populates the Intent with the user's settings (using putExtra)
         // If the user has set all necessary settings, launch the GameActivity and finish this activity
     }
-
 }

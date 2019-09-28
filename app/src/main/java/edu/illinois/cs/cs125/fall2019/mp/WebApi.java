@@ -33,56 +33,80 @@ import java.util.function.Consumer;
  */
 public final class WebApi {
 
-    /** Tag for logged messages. */
+    /**
+     * Tag for logged messages.
+     */
     private static final String TAG = "WebApi";
 
-    /** The URL at which the server is hosted. */
+    /**
+     * The URL at which the server is hosted.
+     */
     static final String API_BASE = "https://cs125-cloud.cs.illinois.edu/Fall2019-MP";
 
-    /** The URL at which the webserver socket is hosted. */
+    /**
+     * The URL at which the webserver socket is hosted.
+     */
     static final String WEBSOCKET_BASE = "wss://cs125-cloud.cs.illinois.edu/Fall2019-MP";
 
-    /** The HTTP status code for Bad Request. */
+    /**
+     * The HTTP status code for Bad Request.
+     */
     private static final int HTTP_BAD_REQUEST = 400;
 
-    /** Timeout (milliseconds) for connecting to a game websocket. */
+    /**
+     * Timeout (milliseconds) for connecting to a game websocket.
+     */
     private static final int WEBSOCKET_CONNECTION_TIMEOUT = 5000;
 
-    /** Interval (milliseconds) at which to make sure the websocket is still connected. */
+    /**
+     * Interval (milliseconds) at which to make sure the websocket is still connected.
+     */
     private static final int WEBSOCKET_PING_INTERVAL = 60000;
 
-    /** The Volley request queue for the application, or null if the queue hasn't been set up yet. */
+    /**
+     * The Volley request queue for the application, or null if the queue hasn't been set up yet.
+     */
     private static RequestQueue requestQueue;
 
-    /** The Gson parser used to parse response JSON. */
+    /**
+     * The Gson parser used to parse response JSON.
+     */
     private static JsonParser jsonParser = new JsonParser();
 
-    /** Private constructor to prevent creating instances. */
-    private WebApi() { }
+    /**
+     * Private constructor to prevent creating instances.
+     */
+    private WebApi() {
+    }
 
     /**
      * Starts an HTTP GET request.
-     * @param context an Android context
-     * @param url the URL to contact
-     * @param listener callback to run with response data
+     *
+     * @param context       an Android context
+     * @param url           the URL to contact
+     * @param listener      callback to run with response data
      * @param errorListener callback to run if an error occurs
      */
     public static void startRequest(final Context context, final String url,
-                             final Response.Listener<JsonObject> listener, final Response.ErrorListener errorListener) {
+                                    final Response.Listener<JsonObject> listener,
+                                    final Response.ErrorListener errorListener) {
         startRequest(context, url, Request.Method.GET, null, listener, errorListener);
     }
 
     /**
      * Starts a network request with a JSON object as the payload.
-     * @param context an Android context
-     * @param url the URL to contact
-     * @param method the HTTP method (e.g. GET or POST)
-     * @param body the JSON object to include in the body
-     * @param listener callback to run with response data
+     *
+     * @param context       an Android context
+     * @param url           the URL to contact
+     * @param method        the HTTP method (e.g. GET or POST)
+     * @param body          the JSON object to include in the body
+     * @param listener      callback to run with response data
      * @param errorListener callback to run if an error occurs
      */
-    public static void startRequest(final Context context, final String url, final int method, final JsonElement body,
-                             final Response.Listener<JsonObject> listener, final Response.ErrorListener errorListener) {
+    public static void startRequest(final Context context, final String url,
+                                    final int method, final JsonElement body,
+                                    final Response.Listener<JsonObject> listener,
+                                    final Response.ErrorListener errorListener) {
         if (requestQueue == null) {
             Log.i(TAG, "Creating request queue");
             requestQueue = Volley.newRequestQueue(context.getApplicationContext());
@@ -119,47 +143,51 @@ public final class WebApi {
             }
         };
         user.getIdToken(false).addOnSuccessListener(result ->
-            requestQueue.add(new StringRequest(method, url, serverResponseListener, serverErrorListener) {
-                {
-                    Log.i(TAG, "startRequest creating Volley request (received Firebase ID token)");
-                }
-                @Override
-                public byte[] getBody() throws AuthFailureError {
-                    if (body == null) {
-                        return super.getBody();
-                    } else {
-                        return body.toString().getBytes();
+                requestQueue.add(new StringRequest(method, url, serverResponseListener, serverErrorListener) {
+                    {
+                        Log.i(TAG, "startRequest creating Volley request (received Firebase ID token)");
                     }
-                }
-                @Override
-                public String getBodyContentType() {
-                    if (body == null) {
-                        return super.getBodyContentType();
-                    } else {
-                        return "application/json";
+
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        if (body == null) {
+                            return super.getBody();
+                        } else {
+                            return body.toString().getBytes();
+                        }
                     }
-                }
-                @Override
-                public Map<String, String> getHeaders() {
-                    return Collections.singletonMap("Firebase-Token", result.getToken());
-                }
-            })
+
+                    @Override
+                    public String getBodyContentType() {
+                        if (body == null) {
+                            return super.getBodyContentType();
+                        } else {
+                            return "application/json";
+                        }
+                    }
+
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        return Collections.singletonMap("Firebase-Token", result.getToken());
+                    }
+                })
         ).addOnFailureListener(e -> errorListener.onErrorResponse(new VolleyError(e)));
         Log.i(TAG, "startRequest started getIdToken");
     }
 
     /**
      * Connects to a websocket.
-     * @param url the websocket endpoint
-     * @param dataListener receiver for data messages
-     * @param onCreatedListener callback to run with the websocket when it is created
+     *
+     * @param url                    the websocket endpoint
+     * @param dataListener           receiver for data messages
+     * @param onCreatedListener      callback to run with the websocket when it is created
      * @param connectionLostListener callback to run if the connection is lost
-     * @param errorListener callback to run if an error occurs during the initial connection
+     * @param errorListener          callback to run if an error occurs during the initial connection
      */
     public static void connectWebSocket(final String url, final Consumer<JsonObject> dataListener,
-                                 final Consumer<WebSocket> onCreatedListener,
-                                 final Runnable connectionLostListener,
-                                 final Consumer<Throwable> errorListener) {
+                                        final Consumer<WebSocket> onCreatedListener,
+                                        final Runnable connectionLostListener,
+                                        final Consumer<Throwable> errorListener) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             Log.e(TAG, "connectWebSocket called before Firebase Authentication login");
@@ -175,14 +203,17 @@ public final class WebApi {
                 socket.addHeader("Firebase-Token", result.getToken());
                 socket.addListener(new WebSocketAdapter() {
                     private boolean disconnectedDueToError = false;
+
                     @Override
                     public void onTextMessage(final WebSocket websocket, final String text) {
                         dataListener.accept(jsonParser.parse(text).getAsJsonObject());
                     }
+
                     @Override
                     public void onError(final WebSocket websocket, final WebSocketException cause) {
                         disconnectedDueToError = true;
                     }
+
                     @Override
                     public void onDisconnected(final WebSocket websocket, final WebSocketFrame serverCloseFrame,
                                                final WebSocketFrame clientCloseFrame, final boolean closedByServer) {
@@ -193,6 +224,7 @@ public final class WebApi {
                             Log.i(TAG, "Websocket closed to " + url);
                         }
                     }
+
                     @Override
                     public void onConnectError(final WebSocket websocket, final WebSocketException exception) {
                         disconnectedDueToError = false;

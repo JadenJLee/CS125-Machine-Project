@@ -37,36 +37,56 @@ import com.google.android.gms.location.LocationResult;
  */
 public final class LocationListenerService extends Service {
 
-    /** Tag for logging. */
+    /**
+     * Tag for logging.
+     */
     private static final String TAG = "LocationListenerService";
 
-    /** The Google API object used to listen for location updates. */
+    /**
+     * The Google API object used to listen for location updates.
+     */
     private FusedLocationProviderClient locationClient;
 
-    /** Callback to receive location updates. */
+    /**
+     * Callback to receive location updates.
+     */
     private LocationCallback locationCallback;
 
-    /** A broadcaster that only transmits inside the app. */
+    /**
+     * A broadcaster that only transmits inside the app.
+     */
     private LocalBroadcastManager broadcaster;
 
-    /** The channel name of the foreground service notification. */
+    /**
+     * The channel name of the foreground service notification.
+     */
     private static final String NOTIFICATION_CHANNEL = "CS125Location";
 
-    /** The ID of the foreground service notification. */
+    /**
+     * The ID of the foreground service notification.
+     */
     private static final int NOTIFICATION_ID = 125;
 
-    /** The requested interval between location updates, in milliseconds. */
+    /**
+     * The requested interval between location updates, in milliseconds.
+     */
     private static final int LOCATION_UPDATE_INTERVAL = 5000;
 
-    /** The location request for FusedLocationProviderClient. */
+    /**
+     * The location request for FusedLocationProviderClient.
+     */
     private static final LocationRequest LOCATION_REQUEST = LocationRequest.create()
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
             .setInterval(LOCATION_UPDATE_INTERVAL);
 
-    /** The action name for the location-update Intents. */
+    /**
+     * The action name for the location-update Intents.
+     */
     static final String UPDATE_ACTION = "LocationUpdate";
 
-    /** The name of the Intent extra data item that holds the new location. */
+    /**
+     * The name of the Intent extra data item that holds the new location.
+     */
     static final String UPDATE_DATA_ID = "Location";
 
     /**
@@ -104,8 +124,9 @@ public final class LocationListenerService extends Service {
 
     /**
      * Called when the service is started. Starts location updates.
-     * @param intent unused
-     * @param flags unused
+     *
+     * @param intent  unused
+     * @param flags   unused
      * @param startId unused
      * @return the restart policy of the service: recreate ASAP
      */
@@ -141,6 +162,7 @@ public final class LocationListenerService extends Service {
 
     /**
      * Called when the location system provides a location update.
+     *
      * @param location a non-null location
      */
     private void gotLocationUpdate(final Location location) {
@@ -152,6 +174,7 @@ public final class LocationListenerService extends Service {
 
     /**
      * Called when a component tries to bind to the service for interprocess communication.
+     *
      * @param intent the binding Intent (unused)
      * @return always null, since this isn't a bound service
      */

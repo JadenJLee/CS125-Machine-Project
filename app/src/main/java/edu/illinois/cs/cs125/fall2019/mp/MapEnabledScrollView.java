@@ -19,6 +19,7 @@ public final class MapEnabledScrollView extends ScrollView {
 
     /**
      * Creates a MapEnabledScrollView UI control.
+     *
      * @param context a UI context
      */
     public MapEnabledScrollView(final Context context) {
@@ -27,8 +28,9 @@ public final class MapEnabledScrollView extends ScrollView {
 
     /**
      * Creates a MapEnabledScrollView UI control.
+     *
      * @param context a UI context
-     * @param attrs the AttributeSet passed to the ScrollView constructor
+     * @param attrs   the AttributeSet passed to the ScrollView constructor
      */
     public MapEnabledScrollView(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -36,8 +38,9 @@ public final class MapEnabledScrollView extends ScrollView {
 
     /**
      * Creates a MapEnabledScrollView UI control.
-     * @param context a UI context
-     * @param attrs the AttributeSet passed to the ScrollView constructor
+     *
+     * @param context  a UI context
+     * @param attrs    the AttributeSet passed to the ScrollView constructor
      * @param defStyle an @attr/ resource ID
      */
     public MapEnabledScrollView(final Context context, final AttributeSet attrs, final int defStyle) {
@@ -46,9 +49,10 @@ public final class MapEnabledScrollView extends ScrollView {
 
     /**
      * Creates a MapEnabledScrollView UI control.
-     * @param context a UI context
-     * @param attrs the AttributeSet passed to the ScrollView constructor
-     * @param defStyle an @attr/ resource ID
+     *
+     * @param context     a UI context
+     * @param attrs       the AttributeSet passed to the ScrollView constructor
+     * @param defStyle    an @attr/ resource ID
      * @param defStyleRes a @style/ resource ID
      */
     public MapEnabledScrollView(final Context context, final AttributeSet attrs, final int defStyle,
@@ -61,6 +65,7 @@ public final class MapEnabledScrollView extends ScrollView {
      * <p>
      * Usually ScrollView intercepts some events, in which case the views contained in it
      * do not receive them. This implementation never steals the events.
+     *
      * @param ev the event
      * @return always false
      */
@@ -81,6 +86,7 @@ public final class MapEnabledScrollView extends ScrollView {
      * <p>
      * This implementation does the same thing as a normal ScrollView except that it always
      * says the event was handled.
+     *
      * @param ev the event
      * @return always true
      */

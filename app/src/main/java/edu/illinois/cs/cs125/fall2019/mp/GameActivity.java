@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.ActivityCompat;
@@ -39,48 +40,75 @@ import java.util.List;
  */
 public final class GameActivity extends AppCompatActivity {
 
-    /** The tag for Log calls - this makes it easier to tell what component messages come from. */
+    /**
+     * The tag for Log calls - this makes it easier to tell what component messages come from.
+     */
     private static final String TAG = "GameActivity";
 
-    /** The radial location accuracy required to send a location update. */
+    /**
+     * The radial location accuracy required to send a location update.
+     */
     private static final float REQUIRED_LOCATION_ACCURACY = 28f;
 
-    /** How close the user onhas to be (in meters) to a target to capture it. */
+    /**
+     * How close the user onhas to be (in meters) to a target to capture it.
+     */
     private static final int PROXIMITY_THRESHOLD = 20;
 
-    /** Hue of the markers showing captured target locations.
-     * Note that this is ONLY the hue; markers don't allow specifying the RGB color like other map elements do. */
+    /**
+     * Hue of the markers showing captured target locations.
+     * Note that this is ONLY the hue; markers don't allow specifying the RGB color like other map elements do.
+     */
     private static final float CAPTURED_MARKER_HUE = BitmapDescriptorFactory.HUE_GREEN;
 
-    /** Color of other map elements related to the player's progress (e.g. lines connecting captured targets). */
+    /**
+     * Color of other map elements related to the player's progress (e.g. lines connecting captured targets).
+     */
     private static final int PLAYER_COLOR = Color.GREEN;
 
-    /** The handler for location updates sent by the location listener service. */
+    /**
+     * The handler for location updates sent by the location listener service.
+     */
     private BroadcastReceiver locationUpdateReceiver;
 
-    /** A reference to the map control. */
+    /**
+     * A reference to the map control.
+     */
     private GoogleMap map;
 
-    /** Whether the user's location has been found and used to center the map. */
+    /**
+     * Whether the user's location has been found and used to center the map.
+     */
     private boolean centeredMap;
 
-    /** Whether permission has been granted to access the phone's exact location. */
+    /**
+     * Whether permission has been granted to access the phone's exact location.
+     */
     private boolean hasLocationPermission;
 
-    /** The predefined targets' latitudes. */
+    /**
+     * The predefined targets' latitudes.
+     */
     private double[] targetLats;
 
-    /** The predefined targets' longitudes. */
+    /**
+     * The predefined targets' longitudes.
+     */
     private double[] targetLngs;
 
-    /** The sequence of target indexes captured by the player (-1 if slot not used yet). */
+    /**
+     * The sequence of target indexes captured by the player (-1 if slot not used yet).
+     */
     private int[] path;
 
-    /** List of the markers that have been added by the placeMarker function. */
+    /**
+     * List of the markers that have been added by the placeMarker function.
+     */
     private List<Marker> markers = new ArrayList<>();
 
     /**
      * Called by the Android system when the activity is created. Performs initial setup.
+     *
      * @param savedInstanceState saved state from the last terminated instance (unused)
      */
     @Override
@@ -147,7 +175,7 @@ public final class GameActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // If permission isn't already granted, start a request
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
             Log.i(TAG, "Asked for location permission");
             // The result will be delivered to the onRequestPermissionsResult function
         } else {
@@ -190,10 +218,12 @@ public final class GameActivity extends AppCompatActivity {
      * Called when a high-confidence location update is available.
      * <p>
      * You need to implement this function to make the game work.
-     * @param latitude the phone's current latitude
+     *
+     * @param latitude  the phone's current latitude
      * @param longitude the phone's current longitude
      */
-    @VisibleForTesting // Actually just visible for documentation - not called directly by test suites
+    @VisibleForTesting
+    // Actually just visible for documentation - not called directly by test suites
     public void updateLocation(final double latitude, final double longitude) {
         if (TargetVisitChecker.getTargetWithinRange(targetLats, targetLngs,
                 path, latitude, longitude, PROXIMITY_THRESHOLD) != -1) {
@@ -225,11 +255,12 @@ public final class GameActivity extends AppCompatActivity {
 
     /**
      * Adds a colored line to the Google map.
+     *
      * @param startLat the latitude of one endpoint of the line
      * @param startLng the longitude of that endpoint
-     * @param endLat the latitude of the other endpoint of the line
-     * @param endLng the longitude of that other endpoint
-     * @param color the color to fill the line with
+     * @param endLat   the latitude of the other endpoint of the line
+     * @param endLng   the longitude of that other endpoint
+     * @param color    the color to fill the line with
      */
     @VisibleForTesting
     public void addLine(final double startLat, final double startLng,
@@ -251,7 +282,8 @@ public final class GameActivity extends AppCompatActivity {
 
     /**
      * Places a marker on the map at the specified coordinates.
-     * @param latitude the marker's latitude
+     *
+     * @param latitude  the marker's latitude
      * @param longitude the marker's longitude
      */
     @VisibleForTesting // For documentation
@@ -272,9 +304,10 @@ public final class GameActivity extends AppCompatActivity {
     /**
      * Changes the hue of the marker at the specified position.
      * The marker should have been previously added by placeMarker.
-     * @param latitude the marker's latitude
+     *
+     * @param latitude  the marker's latitude
      * @param longitude the marker's longitude
-     * @param hue the new hue, e.g. a constant from BitmapDescriptorFactory
+     * @param hue       the new hue, e.g. a constant from BitmapDescriptorFactory
      */
     @VisibleForTesting
     public void changeMarkerColor(final double latitude, final double longitude, final float hue) {
@@ -299,6 +332,7 @@ public final class GameActivity extends AppCompatActivity {
 
     /**
      * Centers the map on the user's location if the map hasn't been centered yet.
+     *
      * @param location the current location
      */
     private void ensureCenteredMap(final Location location) {
@@ -360,8 +394,9 @@ public final class GameActivity extends AppCompatActivity {
 
     /**
      * Called by the Android system when a permissions request receives a response from the user.
-     * @param requestCode the ID of the request (always 0 in our case)
-     * @param permissions the affected permissions' names
+     *
+     * @param requestCode  the ID of the request (always 0 in our case)
+     * @param permissions  the affected permissions' names
      * @param grantResults whether each permission was granted (corresponds to the permissions array)
      */
     @Override

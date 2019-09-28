@@ -17,20 +17,30 @@ import java.util.Scanner;
  */
 public final class DefaultTargets {
 
-    /** Private constructor to prevent creating instances. */
-    private DefaultTargets() { }
+    /**
+     * Private constructor to prevent creating instances.
+     */
+    private DefaultTargets() {
+    }
 
-    /** Positions of example targets. */
+    /**
+     * Positions of example targets.
+     */
     private static List<LatLng> targets;
 
-    /** Whether to allow using this class at all. */
+    /**
+     * Whether to allow using this class at all.
+     */
     private static boolean allowUse = true;
 
-    /** Whether to allow getting arrays of coordinates independently. */
+    /**
+     * Whether to allow getting arrays of coordinates independently.
+     */
     private static boolean allowIndependentArrays = true;
 
     /**
      * Loads the default targets list if it hasn't already been loaded.
+     *
      * @param context the Android context to load the data from
      */
     private static void loadIfNeeded(final Context context) {
@@ -71,6 +81,7 @@ public final class DefaultTargets {
 
     /**
      * Gets an array of the targets' latitudes.
+     *
      * @param context an Android context
      * @return the latitude for each target
      */
@@ -84,6 +95,7 @@ public final class DefaultTargets {
 
     /**
      * Gets an array of the targets' longitudes.
+     *
      * @param context an Android context
      * @return the longitude for each target
      */
@@ -97,6 +109,7 @@ public final class DefaultTargets {
 
     /**
      * Gets the positions of the default targets as LatLng instances.
+     *
      * @param context an Android context
      * @return the position of each target
      */

@@ -30,12 +30,13 @@ public class TargetVisitChecker {
      * All coordinates are valid. The range is positive.
      * <p>
      * This function should not modify the arrays it receives.
-     * @param latitudes latitudes of all targets
-     * @param longitudes longitudes of all targets (same size as latitudes)
-     * @param path indexes of targets visited so far (same size as latitudes, -1 for empty slots)
-     * @param currentLatitude the current latitude
+     *
+     * @param latitudes        latitudes of all targets
+     * @param longitudes       longitudes of all targets (same size as latitudes)
+     * @param path             indexes of targets visited so far (same size as latitudes, -1 for empty slots)
+     * @param currentLatitude  the current latitude
      * @param currentLongitude the current longitude
-     * @param range maximum distance to target, in meters
+     * @param range            maximum distance to target, in meters
      * @return the index of a target within the range that is not on the path, or -1 if no such target exists
      */
 
@@ -75,10 +76,11 @@ public class TargetVisitChecker {
      * been visited yet). No existing lines violate the snake rule.
      * <p>
      * This function should not modify the arrays it receives.
-     * @param latitudes latitudes of all targets
+     *
+     * @param latitudes  latitudes of all targets
      * @param longitudes longitudes of all targets
-     * @param path indexes of targets visited so far (-1 for empty slots)
-     * @param tryVisit index of the target to try to visit
+     * @param path       indexes of targets visited so far (-1 for empty slots)
+     * @param tryVisit   index of the target to try to visit
      * @return whether the target can be claimed
      */
     public static boolean checkSnakeRule(final double[] latitudes, final double[] longitudes, final int[] path,
@@ -116,7 +118,8 @@ public class TargetVisitChecker {
      * <p>
      * It is assumed that all parameters are valid. The path array is non-null and does not yet contain
      * the target index. The target index is non-negative.
-     * @param path the path array
+     *
+     * @param path        the path array
      * @param targetIndex the target being visited
      * @return the index in the path array that was updated, or -1 if the path array was full
      */
