@@ -1,5 +1,7 @@
 package edu.illinois.cs.cs125.fall2019.mp;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Divides a rectangular area into identically sized, roughly square cells.
  */
@@ -24,6 +26,34 @@ public class AreaDivider extends java.lang.Object {
      * cellSize is the requested side length of each cell in meters.
      */
     private double cellSize;
+    /**
+     * southWest is the latitude and Longitude of the southwest corner.
+     */
+    private LatLng southWest;
+    /**
+     * northWest is the latitude and Longitude of the northwest corner.
+     */
+    private LatLng northWest;
+    /**
+     * northEast is the latitude and Longitude of the northeast corner.
+     */
+    private LatLng northEast;
+    /**
+     * southEast is the latitude and Longitude of the southeast corner.
+     */
+    private LatLng southEast;
+
+    /**
+     * gets the width of the cell.
+     */
+    private double cellWidth;
+
+    /**
+     * gets thje height of the cell.
+     */
+    private double cellHeight;
+
+
 
     /**
      * @param setNorth    sets the latitude of the north boundary
@@ -41,6 +71,15 @@ public class AreaDivider extends java.lang.Object {
         south = setSouth;
         west = setWest;
         cellSize = setCellSize;
+
+        southWest = new LatLng(setSouth, setWest);
+        northWest = new LatLng(setNorth, setWest);
+        northEast = new LatLng(setNorth, setEast);
+        southEast = new LatLng(setSouth, setEast);
+        cellWidth = (setEast - setWest) / getXCells();
+        cellHeight = (setNorth - setSouth) / getYCells();
+
+
     }
 
     /**
@@ -48,8 +87,9 @@ public class AreaDivider extends java.lang.Object {
      * @param y is the cell's Y coordinate
      * @return the boundaries of the cell
      */
-    public com.google.android.gms.maps.model.LatLngBounds getCellBounds(final int x, final int y) {
-        return null;
+    public com.google.android.gms.maps.model.LatLngBounds getCellBounds(final int x,
+                                                                        final int y) {
+
     }
 
     /**
@@ -59,12 +99,10 @@ public class AreaDivider extends java.lang.Object {
      */
     public int getXCells() {
 
-        double distance = (LatLngUtils.distance(0, west, 0, east));
-        System.out.println(distance);
-        double numberOfCells = distance / cellSize;
-        System.out.println(cellSize);
-        // return (int) java.lang.Math.ceil(numberOfCells);
-        return 0;
+        double distance = (LatLngUtils.distance(northWest, northEast));
+        int newDistance = (int) java.lang.Math.ceil(distance);
+        double numberOfCells = newDistance / cellSize;
+        return (int) java.lang.Math.ceil(numberOfCells);
     }
 
     /**
@@ -72,7 +110,11 @@ public class AreaDivider extends java.lang.Object {
      * @return the X coordinate of the cell containing the specified latitude-longitude point
      */
     public int getXCoordinate(final com.google.android.gms.maps.model.LatLng location) {
-        return 0;
+        double distance = (LatLngUtils.distance(location.latitude, location.longitude, location.latitude, west));
+        System.out.println(distance);
+        double output = distance / cellSize;
+        return (int) output;
+
     }
 
     /**
@@ -81,12 +123,10 @@ public class AreaDivider extends java.lang.Object {
      * @return the number of cells in the Y direction
      */
     public int getYCells() {
-        double distance = (LatLngUtils.distance(north, 0, south, 0));
-        System.out.println(distance);
-        double numberOfCells = distance / cellSize;
-        System.out.println(cellSize);
-        // return (int) java.lang.Math.ceil(numberOfCells);
-        return 0;
+        double distance = (LatLngUtils.distance(southWest, northWest));
+        int newDistance = (int) java.lang.Math.ceil(distance);
+        double numberOfCells = newDistance / cellSize;
+        return (int) java.lang.Math.ceil(numberOfCells);
     }
 
     /**
@@ -94,7 +134,10 @@ public class AreaDivider extends java.lang.Object {
      * @return the Y coordinate of the cell containing the specified latitude-longitude point
      */
     public int getYCoordinate(final com.google.android.gms.maps.model.LatLng location) {
-        return 0;
+        double distance = (LatLngUtils.distance(location.latitude, location.longitude, south, location.longitude));
+        System.out.println(distance);
+        double output = distance / cellSize;
+        return (int) output;
     }
 
     /**
