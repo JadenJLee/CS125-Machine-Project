@@ -1,6 +1,7 @@
 package edu.illinois.cs.cs125.fall2019.mp;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 /**
  * Divides a rectangular area into identically sized, roughly square cells.
@@ -89,7 +90,8 @@ public class AreaDivider extends java.lang.Object {
      */
     public com.google.android.gms.maps.model.LatLngBounds getCellBounds(final int x,
                                                                         final int y) {
-
+        return new LatLngBounds(new LatLng(south + (y) * cellHeight, west + (x) * cellWidth),
+                new LatLng(south + (y + 1) * cellHeight, west + (x + 1) * cellWidth));
     }
 
     /**
@@ -110,9 +112,8 @@ public class AreaDivider extends java.lang.Object {
      * @return the X coordinate of the cell containing the specified latitude-longitude point
      */
     public int getXCoordinate(final com.google.android.gms.maps.model.LatLng location) {
-        double distance = (LatLngUtils.distance(location.latitude, location.longitude, location.latitude, west));
-        System.out.println(distance);
-        double output = distance / cellSize;
+        double distance = location.longitude - southWest.longitude;
+        double output = distance / cellWidth;
         return (int) output;
 
     }
@@ -134,9 +135,8 @@ public class AreaDivider extends java.lang.Object {
      * @return the Y coordinate of the cell containing the specified latitude-longitude point
      */
     public int getYCoordinate(final com.google.android.gms.maps.model.LatLng location) {
-        double distance = (LatLngUtils.distance(location.latitude, location.longitude, south, location.longitude));
-        System.out.println(distance);
-        double output = distance / cellSize;
+        double distance = location.latitude - southWest.latitude;
+        double output = distance / cellHeight;
         return (int) output;
     }
 
