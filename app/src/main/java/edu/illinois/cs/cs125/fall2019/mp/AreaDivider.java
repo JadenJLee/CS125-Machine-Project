@@ -2,6 +2,7 @@ package edu.illinois.cs.cs125.fall2019.mp;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 /**
  * Divides a rectangular area into identically sized, roughly square cells.
@@ -50,10 +51,14 @@ public class AreaDivider extends java.lang.Object {
     private double cellWidth;
 
     /**
-     * gets thje height of the cell.
+     * gets the height of the cell.
      */
     private double cellHeight;
 
+    /**
+     * map is the google map to draw lines on.
+     */
+    //private GoogleMap map;
 
 
     /**
@@ -141,11 +146,40 @@ public class AreaDivider extends java.lang.Object {
     }
 
     /**
+     * @param startLat the starting latitude of one point on the line.
+     * @param startLng the starting longitude of one point on the line.
+     * @param endLat the ending latitude of one point on the line.
+     * @param endLng the ending longitude of one point on the line.
+     * @param map the map to draw on.
+     */
+    public void addLine(final double startLat, final double startLng,
+                        final double endLat, final double endLng, final com.google.android.gms.maps.GoogleMap map) {
+        // Convert the loose coordinates to a Google Maps LatLng object
+        LatLng start = new LatLng(startLat, startLng);
+        LatLng end = new LatLng(endLat, endLng);
+
+        // Configure and add a colored line
+        final int lineThickness = 12;
+        PolylineOptions fill = new PolylineOptions().add(start, end).width(lineThickness).zIndex(1);
+        map.addPolyline(fill);
+
+    }
+
+
+    /**
      * Draws the grid to a map using solid black polylines.
      *
      * @param map the Google map to draw on
      */
     public void renderGrid(final com.google.android.gms.maps.GoogleMap map) {
+        for (double i = 0; i <= getXCells(); i++) {
+            double westPlusCellWidth = west + (i * cellWidth);
+            this.addLine(south, westPlusCellWidth, north, westPlusCellWidth, map);
+        }
+        for (double j = 0; j <= getYCells(); j++) {
+            double southPlusCellHeight = south + (j * cellHeight);
+            this.addLine(southPlusCellHeight, west, southPlusCellHeight, east, map);
+        }
     }
 
 }
