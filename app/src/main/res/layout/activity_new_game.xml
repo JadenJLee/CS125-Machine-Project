@@ -10,19 +10,75 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <RadioGroup
             android:id="@+id/gameModeGroup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"/>
+            android:orientation="horizontal"
+            android:visibility="visible">
 
-        <fragment
-            android:id="@+id/areaSizeMap"
-            class="com.google.android.gms.maps.SupportMapFragment"
+            <RadioButton
+                android:id="@+id/targetModeOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Target Mode Gameplay" />
+
+            <RadioButton
+                android:id="@+id/areaModeOption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Area Mode Gameplay" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/areaSettings"
             android:layout_width="match_parent"
-            android:layout_height="300dp" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <fragment
+                android:id="@+id/areaSizeMap"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="300dp" />
+
+            <EditText
+                android:id="@+id/cellSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:text="Click to set Cell Size!" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/targetSettings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/proximityThreshold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="number"
+                android:text="Click to set Proximity Threshold!" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/createGame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Game!" />
 
     </LinearLayout>
 </edu.illinois.cs.cs125.fall2019.mp.MapEnabledScrollView>
