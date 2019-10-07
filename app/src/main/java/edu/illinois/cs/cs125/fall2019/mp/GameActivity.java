@@ -184,6 +184,7 @@ public final class GameActivity extends AppCompatActivity {
             hasLocationPermission = true;
             startLocationWatching();
         }
+
     }
 
     /**
