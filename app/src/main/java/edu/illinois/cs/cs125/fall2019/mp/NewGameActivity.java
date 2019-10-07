@@ -84,7 +84,7 @@ public final class NewGameActivity extends AppCompatActivity {
          * lambdas for functions with a non-void return type need return statements, again like
          * normal functions.
          */
-        finish();
+//        finish();
 
         // Suppose modeGroup is a RadioGroup variable (maybe an instance variable?)
         RadioGroup modeGroup = findViewById(R.id.gameModeGroup);
@@ -141,54 +141,55 @@ public final class NewGameActivity extends AppCompatActivity {
      * Code to run when the Create Game button is clicked.
      */
     private void createGameClicked() {
-        return;
 
-//        Intent intent = new Intent(this, GameActivity.class);
-////        RadioGroup gameModeGroup = findViewById(R.id.gameModeGroup);
-////        // Set up an Intent that will launch GameActivity
-////        boolean clicked = (gameModeGroup.getCheckedRadioButtonId() != -1);
-////
-////        if (!clicked) {
-////            return;
-////        }
-////
-////        if (gameModeGroup.getCheckedRadioButtonId() == R.id.targetModeOption) {
-////            System.out.println("target mode button was clicked!");
-////            intent.putExtra("mode", "target");
-////        } else if (gameModeGroup.getCheckedRadioButtonId() == R.id.areaModeOption) {
-////            System.out.println("area mode button was clicked!");
-////            intent.putExtra("mode", "area");
-////        }
-////        if (intent.getStringExtra("mode").equals("target")) {
-////            EditText mProximityThreshold = findViewById(R.id.proximityThreshold);
-////            String text = mProximityThreshold.getText().toString();
-////            int number;
-////            try {
-////                number = Integer.parseInt(text); // This will crash if text isn't a number
-////            } catch (NumberFormatException e) {
-////                System.out.println("Please enter a number!");
-////                return;
-////            }
-////
-////            intent.putExtra("proximity Threshold", number);
-////        } else if (intent.getStringExtra("mode").equals("area")) {
-////            EditText mCellSize = findViewById(R.id.cellSize);
-////            String text = mCellSize.getText().toString();
-////            int number;
-////            try {
-////                number = Integer.parseInt(text); // This will crash if text isn't a number
-////            } catch (NumberFormatException e) {
-////                System.out.println("Please enter a number!");
-////                return;
-////            }
-////            intent.putExtra("cellSize", number);
-////            LatLngBounds bounds = areaMap.getProjection().getVisibleRegion().latLngBounds;
-////            intent.putExtra("areaNorth", bounds.northeast.latitude);
-////            intent.putExtra("areaEast", bounds.northeast.longitude);
-////            intent.putExtra("areaSouth", bounds.southwest.latitude);
-////            intent.putExtra("areaWest", bounds.southwest.longitude);
-////        }
-//        startActivity(intent);
+        Intent intent = new Intent(this, GameActivity.class);
+        RadioGroup gameModeGroup = findViewById(R.id.gameModeGroup);
+        // Set up an Intent that will launch GameActivity
+        boolean clicked = (gameModeGroup.getCheckedRadioButtonId() != -1);
+
+        if (!clicked) {
+            return;
+        }
+
+        if (gameModeGroup.getCheckedRadioButtonId() == R.id.targetModeOption) {
+            System.out.println("target mode button was clicked!");
+            intent.putExtra("mode", "target");
+        } else if (gameModeGroup.getCheckedRadioButtonId() == R.id.areaModeOption) {
+            System.out.println("area mode button was clicked!");
+            intent.putExtra("mode", "area");
+        }
+        if (intent.getStringExtra("mode").equals("target")) {
+            EditText mProximityThreshold = findViewById(R.id.proximityThreshold);
+            String text = mProximityThreshold.getText().toString();
+            int number;
+            try {
+                number = Integer.parseInt(text); // This will crash if text isn't a number
+                System.out.println(number);
+                intent.putExtra("proximityThreshold", number);
+                System.out.println(intent.getIntExtra("proximityThreshold", 0));
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a number!");
+                return;
+            }
+        } else if (intent.getStringExtra("mode").equals("area")) {
+            EditText mCellSize = findViewById(R.id.cellSize);
+            String text = mCellSize.getText().toString();
+            int number;
+            try {
+                number = Integer.parseInt(text); // This will crash if text isn't a number
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a number!");
+                return;
+            }
+            intent.putExtra("cellSize", number);
+            LatLngBounds bounds = areaMap.getProjection().getVisibleRegion().latLngBounds;
+            intent.putExtra("areaNorth", bounds.northeast.latitude);
+            intent.putExtra("areaEast", bounds.northeast.longitude);
+            intent.putExtra("areaSouth", bounds.southwest.latitude);
+            intent.putExtra("areaWest", bounds.southwest.longitude);
+        }
+        startActivity(intent);
+        finish();
         // Complete this function so that it populates the Intent with the user's settings (using putExtra)
         // If the user has set all necessary settings, launch the GameActivity and finish this activity
     }

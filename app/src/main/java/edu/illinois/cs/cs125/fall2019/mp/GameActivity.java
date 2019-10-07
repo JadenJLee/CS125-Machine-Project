@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
@@ -107,6 +108,42 @@ public final class GameActivity extends AppCompatActivity {
     private List<Marker> markers = new ArrayList<>();
 
     /**
+     * areaDivider is a class that helps renderGrid/manage cell boundaries.
+     */
+    private AreaDivider areaDivider;
+
+    /**
+     * the map of cells visited in area mode.
+     */
+    private boolean[][] cellsVisited;
+
+    /**
+     * stores last xCoordinate.
+     */
+    private int lastXCoordinate;
+
+    /**
+     * stores last yCoordinate.
+     */
+    private int lastYCoordinate;
+
+    /**
+     * west.
+     */
+    private double west;
+
+    /**
+     * south.
+     */
+    private double south;
+
+    /**
+     * cellSize.
+     */
+    private double cellsize;
+
+
+    /**
      * Called by the Android system when the activity is created. Performs initial setup.
      *
      * @param savedInstanceState saved state from the last terminated instance (unused)
@@ -114,18 +151,12 @@ public final class GameActivity extends AppCompatActivity {
     @Override
     @SuppressWarnings("ConstantConditions")
     protected void onCreate(final Bundle savedInstanceState) {
+        Intent intent = getIntent();
         Log.i(TAG, "Creating");
         // The "super" call is required for all activities
         super.onCreate(savedInstanceState);
         // Create the UI from the activity_game.xml layout file (in src/main/res/layout)
         setContentView(R.layout.activity_game);
-
-        // Create the coordinate and path arrays
-        targetLats = DefaultTargets.getLatitudes(this);
-        targetLngs = DefaultTargets.getLongitudes(this);
-        path = new int[targetLats.length];
-        Arrays.fill(path, -1); // No targets visited initially
-
         // Find the Google Maps UI component ("fragment")
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.gameMap);
@@ -141,6 +172,8 @@ public final class GameActivity extends AppCompatActivity {
             setUpMap();
             Log.i(TAG, "getMapAsync completed");
         });
+
+
         Log.i(TAG, "getMapAsync started");
 
         // Set up a receiver for location-update messages from the service (LocationListenerService)
@@ -184,6 +217,29 @@ public final class GameActivity extends AppCompatActivity {
             hasLocationPermission = true;
             startLocationWatching();
         }
+        System.out.println(intent.getStringExtra("mode"));
+
+        if (intent.getStringExtra("mode").equals("target")) {
+            // Create the coordinate and path arrays
+            targetLats = DefaultTargets.getLatitudes(this);
+            targetLngs = DefaultTargets.getLongitudes(this);
+            path = new int[targetLats.length];
+            Arrays.fill(path, -1); // No targets visited initially
+
+        } else {
+            double north = intent.getDoubleExtra("areaNorth", 0.0);
+            double east = intent.getDoubleExtra("areaEast", 0.0);
+            west = intent.getDoubleExtra("areaWest", 0.0);
+            south = intent.getDoubleExtra("areaSouth", 0.0);
+            cellsize = intent.getIntExtra("cellSize", 0);
+            if (cellsize == 0) {
+                throw new RuntimeException("asda");
+            }
+            areaDivider = new AreaDivider(north, east, south, west, cellsize);
+            cellsVisited = new boolean[areaDivider.getXCells()][areaDivider.getYCells()];
+        }
+
+
 
     }
 
@@ -207,14 +263,52 @@ public final class GameActivity extends AppCompatActivity {
 
         // Use the provided placeMarker function to add a marker at every target's location
         // HINT: onCreate initializes the relevant arrays (targetLats, targetLngs, path) for you
-        for (int i = 0; i < path.length; i++) {
-            double targetLatitudes = targetLats[i];
-            double targetLongitudes = targetLngs[i];
-            placeMarker(targetLatitudes, targetLongitudes);
+        Intent intent = getIntent();
+        if (intent.getStringExtra("mode").equals("target")) {
+            for (int i = 0; i < path.length; i++) {
+                double targetLatitudes = targetLats[i];
+                double targetLongitudes = targetLngs[i];
+                placeMarker(targetLatitudes, targetLongitudes);
+            }
+        } else {
+            areaDivider.renderGrid(map);
         }
-
     }
 
+    /**
+     * helper function for updateLocation and knowing which cells are taken.
+     * @param arrayMap the 2 dimensional array passed in as the map
+     * @return true if all are false, false if one is true.
+     */
+    public boolean areAllFalse(final boolean[][] arrayMap) {
+        for (int i = 0; i < arrayMap.length; i++) {
+            for (int j = 0; j < arrayMap[i].length; j++) {
+                if (arrayMap[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param xCoord is the x Coordinate.
+     * @param yCoord is the y Coordinate.
+     */
+    private void drawSquare(final int xCoord, final int yCoord) {
+        double xPosLeft = west + (xCoord * areaDivider.getCellWidth());
+        double xPosRight = west + ((xCoord + 1) * areaDivider.getCellWidth());
+        double yPosBottom = south + (yCoord * areaDivider.getCellHeight());
+        double yPosTop = south + ((yCoord + 1) * areaDivider.getCellHeight());
+        LatLng leftBot = new LatLng(yPosBottom, xPosLeft);
+        LatLng rightBot = new LatLng(yPosBottom, xPosRight);
+        LatLng leftTop = new LatLng(yPosTop, xPosLeft);
+        LatLng rightTop = new LatLng(yPosTop, xPosRight);
+        PolygonOptions polygonOptions = new PolygonOptions();
+        polygonOptions.add(leftBot, rightBot, rightTop, leftTop);
+        polygonOptions.fillColor(Color.GREEN);
+        map.addPolygon(polygonOptions);
+    }
     /**
      * Called when a high-confidence location update is available.
      * <p>
@@ -226,22 +320,50 @@ public final class GameActivity extends AppCompatActivity {
     @VisibleForTesting
     // Actually just visible for documentation - not called directly by test suites
     public void updateLocation(final double latitude, final double longitude) {
-        if (TargetVisitChecker.getTargetWithinRange(targetLats, targetLngs,
-                path, latitude, longitude, PROXIMITY_THRESHOLD) != -1) {
-            int indexOfTarget = TargetVisitChecker.getTargetWithinRange(targetLats, targetLngs,
-                    path, latitude, longitude, PROXIMITY_THRESHOLD);
-            if (TargetVisitChecker.checkSnakeRule(targetLats, targetLngs, path, indexOfTarget)) {
-                int x = TargetVisitChecker.visitTarget(path, indexOfTarget);
-                if (x != -1) {
-                    changeMarkerColor(targetLats[indexOfTarget], targetLngs[indexOfTarget],
-                            CAPTURED_MARKER_HUE);
+        Intent intent = getIntent();
+        if (intent.getStringExtra("mode").equals("target")) {
+            int proximity = intent.getIntExtra("proximityThreshold", PROXIMITY_THRESHOLD);
+            if (TargetVisitChecker.getTargetWithinRange(targetLats, targetLngs,
+                    path, latitude, longitude, proximity) != -1) {
+                int indexOfTarget = TargetVisitChecker.getTargetWithinRange(targetLats, targetLngs,
+                        path, latitude, longitude, proximity);
+                if (TargetVisitChecker.checkSnakeRule(targetLats, targetLngs, path, indexOfTarget)) {
+                    int x = TargetVisitChecker.visitTarget(path, indexOfTarget);
+                    if (x != -1) {
+                        changeMarkerColor(targetLats[indexOfTarget], targetLngs[indexOfTarget],
+                                CAPTURED_MARKER_HUE);
+                    }
+                    if (x >= 1) {
+                        addLine(targetLats[path[x - 1]], targetLngs[path[x - 1]],
+                                targetLats[path[x]], targetLngs[path[x]], PLAYER_COLOR);
+                    }
                 }
-                if (x >= 1) {
-                    addLine(targetLats[path[x - 1]], targetLngs[path[x - 1]],
-                            targetLats[path[x]], targetLngs[path[x]], PLAYER_COLOR);
+            }
+        } else {
+            LatLng location = new LatLng(latitude, longitude);
+            int xCoord = areaDivider.getXCoordinate(location);
+            int yCoord = areaDivider.getYCoordinate(location);
+            if (xCoord >= 0 && xCoord < areaDivider.getXCells() && yCoord >= 0 && yCoord < areaDivider.getYCells()) {
+                if (areAllFalse(cellsVisited)) {
+                    cellsVisited[xCoord][yCoord] = true;
+                    drawSquare(xCoord, yCoord);
+                    lastXCoordinate = xCoord;
+                    lastYCoordinate = yCoord;
+                } else {
+                    if (!cellsVisited[xCoord][yCoord]) {
+                        int xDifference = xCoord - lastXCoordinate;
+                        int yDifference = yCoord - lastYCoordinate;
+                        if (Math.abs(xDifference) + Math.abs(yDifference) == 1) {
+                            cellsVisited[xCoord][yCoord] = true;
+                            drawSquare(xCoord, yCoord);
+                            lastXCoordinate = xCoord;
+                            lastYCoordinate = yCoord;
+                        }
+                    }
                 }
             }
         }
+
         // This function is responsible for updating the game state and map according to the user's movements
 
         // HINT: To operate on the game state, use the three methods you implemented in TargetVisitChecker

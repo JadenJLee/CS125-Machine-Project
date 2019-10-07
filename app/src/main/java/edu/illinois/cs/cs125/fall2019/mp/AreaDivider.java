@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 /**
  * Divides a rectangular area into identically sized, roughly square cells.
  */
-public class AreaDivider extends java.lang.Object {
+public class AreaDivider {
     /**
      * north is the latitude of the north boundary.
      */
@@ -89,6 +89,23 @@ public class AreaDivider extends java.lang.Object {
     }
 
     /**
+     * getter for cellwidth.
+     * @return cellWidth.
+     */
+    public double getCellWidth() {
+        return cellWidth;
+    }
+
+    /**
+     * getter for cellHeight.
+     * @return cellHeight.
+     */
+    public double getCellHeight() {
+        return cellHeight;
+    }
+
+
+    /**
      * @param x is the cell's X coordinate
      * @param y is the cell's Y coordinate
      * @return the boundaries of the cell
@@ -119,7 +136,7 @@ public class AreaDivider extends java.lang.Object {
     public int getXCoordinate(final com.google.android.gms.maps.model.LatLng location) {
         double distance = location.longitude - southWest.longitude;
         double output = distance / cellWidth;
-        return (int) output;
+        return (int) Math.floor(output);
 
     }
 
@@ -142,7 +159,7 @@ public class AreaDivider extends java.lang.Object {
     public int getYCoordinate(final com.google.android.gms.maps.model.LatLng location) {
         double distance = location.latitude - southWest.latitude;
         double output = distance / cellHeight;
-        return (int) output;
+        return (int) Math.floor(output);
     }
 
     /**
@@ -165,13 +182,14 @@ public class AreaDivider extends java.lang.Object {
 
     }
 
-
     /**
      * Draws the grid to a map using solid black polylines.
      *
      * @param map the Google map to draw on
      */
     public void renderGrid(final com.google.android.gms.maps.GoogleMap map) {
+
+
         for (double i = 0; i <= getXCells(); i++) {
             double westPlusCellWidth = west + (i * cellWidth);
             this.addLine(south, westPlusCellWidth, north, westPlusCellWidth, map);
