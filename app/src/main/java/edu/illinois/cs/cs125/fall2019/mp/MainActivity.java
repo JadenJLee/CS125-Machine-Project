@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 
@@ -23,6 +24,15 @@ public final class MainActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         // This "super" call is required for all activities
         super.onCreate(savedInstanceState);
+        WebApi.startRequest(this, WebApi.API_BASE + "/games", response -> {
+            // Code in this handler will run when the request completes successfully
+            // Do something with the response?
+        }, error -> {
+                System.out.println("An Error has Occurred.");
+                // Code in this handler will run if the request fails
+                // Maybe notify the user of the error?
+                Toast.makeText(this, "Oh no!", Toast.LENGTH_LONG).show();
+            });
         // Create the UI from a layout resource
         setContentView(R.layout.activity_main);
         Button createGame = findViewById(R.id.createGame);
