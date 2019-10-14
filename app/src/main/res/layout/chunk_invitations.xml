@@ -8,7 +8,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="owner" />
+        android:text="email" />
 
     <TextView
         android:id="@+id/gamemode"
@@ -18,10 +18,10 @@
         android:text="game mode" />
 
     <TextView
-        android:id="@+id/state"
+        android:id="@+id/roleteam"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="state" />
+        android:text="roleteam" />
 
 </LinearLayout>

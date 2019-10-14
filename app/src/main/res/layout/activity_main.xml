@@ -16,13 +16,14 @@
             android:id="@+id/ongoingGamesGroup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
-            <androidx.constraintlayout.widget.Guideline
+            <LinearLayout
                 android:id="@+id/ongoingGamesList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:layout_height="match_parent"
+                android:orientation="vertical"></LinearLayout>
 
             <TextView
                 android:id="@+id/textView3"
@@ -35,7 +36,8 @@
             android:id="@+id/invitationsGroup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:id="@+id/invitationsList"
