@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -57,61 +58,9 @@ public final class MainActivity extends AppCompatActivity {
      */
     private void connect() {
         WebApi.startRequest(this, WebApi.API_BASE + "/games", response -> {
+            setUpUi(response);
             // Code in this handler will run when the request completes successfully
-            // Do something with the response?
-            JsonArray gamesArray = response.get("games").getAsJsonArray();
-            LinearLayout parentongoingGame = findViewById(R.id.ongoingGamesList);
-            LinearLayout parentinvitations = findViewById(R.id.invitationsList);
-            String[] teamName = getResources().getStringArray(R.array.team_choices);
-            for (JsonElement y : gamesArray) {
-                JsonObject asObject = y.getAsJsonObject();
-                String ownerEmail  = asObject.get("owner").getAsString();
-                int gameState = asObject.get("state").getAsInt();
-                String gameMode = asObject.get("mode").getAsString();
-
-                JsonArray playersArray = asObject.get("players").getAsJsonArray();
-
-                for (JsonElement d : playersArray) {
-                    JsonObject dAsObject = d.getAsJsonObject();
-                    String playerEmail = dAsObject.get("email").getAsString();
-                    int playerTeam = dAsObject.get("team").getAsInt();
-                    int playerState = dAsObject.get("state").getAsInt();
-
-                    if (gameState == GameStateID.RUNNING || gameState == GameStateID.PAUSED) {
-                        if (playerState != PlayerStateID.REMOVED) {
-                            if (myEmail.equals(playerEmail)) {
-                                if (playerState == PlayerStateID.INVITED) {
-                                    findViewById(R.id.invitationsGroup).setVisibility(View.VISIBLE);
-                                    View invitationsChunk = getLayoutInflater().inflate(
-                                            R.layout.chunk_invitations, parentinvitations,
-                                            false);
-                                    TextView senderEmail = invitationsChunk.findViewById(R.id.owner);
-                                    senderEmail.setText("Created by: " + ownerEmail);
-                                    TextView senderGameMode = invitationsChunk.findViewById(R.id.gamemode);
-                                    senderGameMode.setText(gameMode + " mode");
-                                    TextView senderRoleTeam = invitationsChunk.findViewById(R.id.roleteam);
-                                    senderRoleTeam.setText(teamName[playerTeam]);
-                                    // Do something with any other views in the chunk...
-                                    parentinvitations.addView(invitationsChunk);
-                                }
-                                if (playerState == PlayerStateID.PLAYING || playerState == PlayerStateID.ACCEPTED) {
-                                    findViewById(R.id.ongoingGamesGroup).setVisibility(View.VISIBLE);
-                                    View ongoingGameChunk = getLayoutInflater().inflate(
-                                            R.layout.chunk_ongoing_game, parentongoingGame,
-                                            false);
-                                    TextView playingEmail = ongoingGameChunk.findViewById(R.id.OGemail);
-                                    playingEmail.setText("Created by " + ownerEmail);
-                                    TextView playingTeam = ongoingGameChunk.findViewById(R.id.OGteam);
-                                    playingTeam.setText(teamName[playerTeam]);
-                                    TextView playingMode = ongoingGameChunk.findViewById(R.id.OGgamemode);
-                                    playingMode.setText(gameMode + " mode");
-                                    parentongoingGame.addView(ongoingGameChunk);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            // Do something with the response
 
         }, error -> {
                 System.out.println("An Error has Occurred.");
@@ -131,6 +80,106 @@ public final class MainActivity extends AppCompatActivity {
      */
     private void setUpUi(final JsonObject result) {
 
+        JsonArray gamesArray = result.get("games").getAsJsonArray();
+        LinearLayout parentongoingGame = findViewById(R.id.ongoingGamesList);
+        LinearLayout parentinvitations = findViewById(R.id.invitationsList);
+        String[] teamName = getResources().getStringArray(R.array.team_choices);
+        parentinvitations.removeAllViews();
+        parentongoingGame.removeAllViews();
+
+        for (JsonElement y : gamesArray) {
+            JsonObject asObject = y.getAsJsonObject();
+            String ownerEmail = asObject.get("owner").getAsString();
+            String gameID = asObject.get("id").getAsString();
+            int gameState = asObject.get("state").getAsInt();
+            String gameMode = asObject.get("mode").getAsString();
+
+            JsonArray playersArray = asObject.get("players").getAsJsonArray();
+
+            for (JsonElement d : playersArray) {
+                JsonObject dAsObject = d.getAsJsonObject();
+                String playerEmail = dAsObject.get("email").getAsString();
+                int playerTeam = dAsObject.get("team").getAsInt();
+                int playerState = dAsObject.get("state").getAsInt();
+
+                if (gameState == GameStateID.RUNNING || gameState == GameStateID.PAUSED) {
+                    if (playerState != PlayerStateID.REMOVED) {
+                        if (myEmail.equals(playerEmail)) {
+                            if (playerState == PlayerStateID.INVITED) {
+                                findViewById(R.id.invitationsGroup).setVisibility(View.VISIBLE);
+                                View invitationsChunk = getLayoutInflater().inflate(
+                                        R.layout.chunk_invitations, findViewById(R.id.invitationsGroup),
+                                        false);
+                                parentinvitations = findViewById(R.id.invitationsList);
+                                TextView senderEmail = invitationsChunk.findViewById(R.id.owner);
+                                senderEmail.setText("Created by: " + ownerEmail);
+                                TextView senderGameMode = invitationsChunk.findViewById(R.id.gamemode);
+                                senderGameMode.setText(gameMode + " mode");
+                                TextView senderRoleTeam = invitationsChunk.findViewById(R.id.roleteam);
+                                senderRoleTeam.setText(teamName[playerTeam]);
+                                // Do something with any other views in the chunk...
+                                Button declineButton = invitationsChunk.findViewById(R.id.decline);
+                                declineButton.setVisibility(View.VISIBLE);
+                                declineButton.setOnClickListener(v -> WebApi.startRequest(
+                                        this, WebApi.API_BASE + "/games/" + gameID + "/decline",
+                                        Request.Method.POST, null, response -> connect(), error ->
+                                                System.out.println("An Error has Occurred.")
+                                        // Code in this handler will run if the request fails
+                                        // Maybe notify the user of the error?
+                                ));
+                                Button acceptButton = invitationsChunk.findViewById(R.id.accept);
+                                acceptButton.setVisibility(View.VISIBLE);
+                                acceptButton.setOnClickListener(v -> WebApi.startRequest(
+                                        this,
+                                        WebApi.API_BASE + "/games/" + gameID + "/accept",
+                                        Request.Method.POST, null, response -> connect(), error ->
+                                                System.out.println("An Error has Occurred.")
+                                        // Code in this handler will run if the request fails
+                                        // Maybe notify the user of the error?
+
+
+                                ));
+
+                                parentinvitations.addView(invitationsChunk);
+                            }
+
+                            if (playerState == PlayerStateID.PLAYING || playerState == PlayerStateID.ACCEPTED) {
+                                findViewById(R.id.ongoingGamesGroup).setVisibility(View.VISIBLE);
+                                View ongoingGameChunk = getLayoutInflater().inflate(
+                                        R.layout.chunk_ongoing_game, findViewById(R.id.ongoingGamesGroup),
+                                        false);
+                                parentongoingGame = findViewById(R.id.ongoingGamesList);
+                                TextView playingEmail = ongoingGameChunk.findViewById(R.id.OGemail);
+                                playingEmail.setText("Created by " + ownerEmail);
+                                TextView playingTeam = ongoingGameChunk.findViewById(R.id.OGteam);
+                                playingTeam.setText(teamName[playerTeam]);
+                                TextView playingMode = ongoingGameChunk.findViewById(R.id.OGgamemode);
+                                playingMode.setText(gameMode + " mode");
+                                parentongoingGame.addView(ongoingGameChunk);
+                                if (!(myEmail.equals(ownerEmail))) {
+                                    Button leaveButton = ongoingGameChunk.findViewById(R.id.leave);
+                                    leaveButton.setVisibility(View.VISIBLE);
+                                    leaveButton.setOnClickListener(v -> WebApi.startRequest(
+                                            this, WebApi.API_BASE + "/games/" + gameID + "/leave",
+                                            Request.Method.POST, null, response -> connect(), error ->
+                                                    System.out.println("An Error has Occurred.")
+                                            // Code in this handler will run if the request fails
+                                            // Maybe notify the user of the error?
+
+
+                                    ));
+                                }
+                                Button enterButton = ongoingGameChunk.findViewById(R.id.enter);
+                                enterButton.setVisibility(View.VISIBLE);
+                                enterButton.setOnClickListener(v -> startActivity(new Intent(
+                                        this, GameActivity.class).putExtra("game", gameID)));
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
         // View ongoingGameChunk = getLayoutInflater().inflate(R.layout.chunk_ongoing_game, parentongoingGame, false);
         // View invitationsChunk = getLayoutInflater().inflate(R.layout.chunk_invitations, parent, false);
         // Hide any optional "loading" UI you added

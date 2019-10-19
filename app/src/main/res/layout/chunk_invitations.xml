@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
@@ -23,5 +24,22 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="roleteam" />
+
+    <Button
+        android:id="@+id/accept"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Accept"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/decline"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Decline"
+        android:visibility="gone"
+        tools:text="Decline" />
 
 </LinearLayout>
