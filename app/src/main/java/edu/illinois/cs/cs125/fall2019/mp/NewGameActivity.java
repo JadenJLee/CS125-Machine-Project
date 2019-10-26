@@ -18,6 +18,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents the game creation screen, where the user configures a new game.
@@ -30,6 +35,16 @@ public final class NewGameActivity extends AppCompatActivity {
      * The Google Maps view used to set the area for area mode. Null until getMapAsync finishes.
      */
     private GoogleMap areaMap;
+
+    /**
+     * The Google Maps view used to set the area for target mode. Null until getMapAsync finishes.
+     */
+    private GoogleMap targetMap;
+
+    /**
+     * List of Markers for the various targets.
+     */
+    private List<Marker> targets = new ArrayList<>();
 
     /**
      * Called by the Android system when the activity is created.
@@ -56,6 +71,34 @@ public final class NewGameActivity extends AppCompatActivity {
             areaMap = newMap;
             // Center it on campustown
             centerMap(areaMap);
+        });
+
+        SupportMapFragment targetsMapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.targetsMap);
+        targetsMapFragment.getMapAsync(newMap -> {
+            targetMap = newMap;
+            centerMap(targetMap);
+
+            targetMap.setOnMapLongClickListener(location -> {
+                MarkerOptions options = new MarkerOptions().position(location);
+                // Add it to the map - Google Maps gives us the created Marker
+                Marker marker = targetMap.addMarker(options);
+                targets.add(marker);
+                // Code here runs whenever the user presses on the map.
+                // location is the LatLng position where the user pressed.
+                // 1. Create a Google Maps Marker at the provided coordinates.
+                // 2. Add it to your targets list instance variable.
+            });
+
+            targetMap.setOnMarkerClickListener(clickedMarker -> {
+                clickedMarker.remove();
+                targets.remove(clickedMarker);
+                // Code here runs whenever the user taps a marker.
+                // clickedMarker is the Marker object the user clicked.
+                // 1. Remove the marker from the map with its remove function.
+                // 2. Remove it from your targets list.
+                return true; // This makes Google Maps not pan the map again
+            });
         });
 
         /*

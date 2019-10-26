@@ -64,6 +64,13 @@
             android:orientation="horizontal"
             android:visibility="gone">
 
+            <fragment
+                android:id="@+id/targetsMap"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="0dp"
+                android:layout_height="300dp"
+                android:layout_weight="1" />
+
             <EditText
                 android:id="@+id/proximityThreshold"
                 android:layout_width="0dp"
