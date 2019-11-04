@@ -15,7 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -24,6 +26,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +57,12 @@ public final class NewGameActivity extends AppCompatActivity {
     /**
      * List of invitees invited to a certain game.
      */
-    private List<Invitee> invitees = new ArrayList<>();;
+    private List<Invitee> invitees = new ArrayList<>();
+
+    /**
+     * the mode selected on the radiogroup.
+     */
+    private RadioGroup selectedMode;
 
     /**
      * Called by the Android system when the activity is created.
@@ -171,6 +180,9 @@ public final class NewGameActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * updates the players list UI.
+     */
     private void updatePlayersUI() {
         LinearLayout playersLayout = findViewById(R.id.playersList);
         playersLayout.removeAllViews();
@@ -214,10 +226,10 @@ public final class NewGameActivity extends AppCompatActivity {
             playersLayout.addView(playersChunk);
         }
     }
-    private boolean isEmpty(final TextView etText) {
-        return etText.getText().toString().trim().length() == 0;
-    }
 
+    /**
+     * adding and invitee.
+     */
     private void addInvitee() {
         TextView inviteeEmail = findViewById(R.id.newInviteeEmail);
         String invitedEmail = inviteeEmail.getText().toString();
@@ -228,11 +240,6 @@ public final class NewGameActivity extends AppCompatActivity {
             updatePlayersUI();
             inviteeEmail.setText("");
         }
-
-
-
-
-
     }
 
 
@@ -273,8 +280,72 @@ public final class NewGameActivity extends AppCompatActivity {
      */
     private void createGameClicked() {
 
-        Intent intent = new Intent(this, GameActivity.class);
+        JsonObject gameCreation = new JsonObject();
+
         RadioGroup gameModeGroup = findViewById(R.id.gameModeGroup);
+
+        //int gameID = selectedMode.getCheckedRadioButtonId();
+
+        Intent intent = new Intent(this, GameActivity.class);
+        if (gameModeGroup.getCheckedRadioButtonId() == R.id.targetModeOption) {
+            intent.putExtra("mode", "target");
+            EditText proximityThresh = findViewById(R.id.proximityThreshold);
+            String proximityThreshasText = proximityThresh.getText().toString();
+            gameCreation.addProperty("mode", "target");
+            JsonArray targetArrays = new JsonArray();
+
+            for (int i = 0; i < targets.size(); i++) {
+                JsonObject target = new JsonObject();
+                target.addProperty("longitude", targets.get(i).getPosition().longitude);
+                target.addProperty("latitude", targets.get(i).getPosition().latitude);
+                targetArrays.add(target);
+            }
+            gameCreation.add("targets", targetArrays);
+
+            if (!proximityThresh.equals("")) {
+                int proximity = Integer.parseInt(proximityThreshasText);
+                intent.putExtra("proximityThreshold", proximity);
+
+                gameCreation.addProperty("proximityThreshold", proximity);
+            }
+        }
+        if (gameModeGroup.getCheckedRadioButtonId() == R.id.areaModeOption) {
+            intent.putExtra("mode", "area");
+            EditText mCellSize = findViewById(R.id.cellSize);
+            String cellSizeasText = mCellSize.getText().toString();
+            if (!cellSizeasText.equals("")) {
+                int number = Integer.parseInt(cellSizeasText);
+                intent.putExtra("cellSize", number);
+                gameCreation.addProperty("cellSize", number);
+                LatLngBounds bounds = areaMap.getProjection().getVisibleRegion().latLngBounds;
+                intent.putExtra("areaNorth", bounds.northeast.latitude);
+                intent.putExtra("areaEast", bounds.northeast.longitude);
+                intent.putExtra("areaSouth", bounds.southwest.latitude);
+                intent.putExtra("areaWest", bounds.southwest.longitude);
+
+                gameCreation.addProperty("areaNorth", bounds.northeast.latitude);
+                gameCreation.addProperty("areaEast", bounds.northeast.longitude);
+                gameCreation.addProperty("areaSouth", bounds.southwest.latitude);
+                gameCreation.addProperty("areaWest", bounds.southwest.longitude);
+            }
+            gameCreation.addProperty("mode", "area");
+        }
+
+        JsonArray invitedList = new JsonArray();
+
+        for (int i = 0; i < invitees.size(); i++) {
+            JsonObject invitedPlayer = new JsonObject();
+            invitedPlayer.addProperty("team", invitees.get(i).getTeamId());
+            invitedPlayer.addProperty("email", invitees.get(i).getEmail());
+            invitedList.add(invitedPlayer);
+        }
+        gameCreation.add("invitees", invitedList);
+
+
+
+
+        //Intent intent = new Intent(this, GameActivity.class);
+
         // Set up an Intent that will launch GameActivity
         boolean clicked = (gameModeGroup.getCheckedRadioButtonId() != -1);
 
@@ -295,7 +366,6 @@ public final class NewGameActivity extends AppCompatActivity {
             int number;
             try {
                 number = Integer.parseInt(text); // This will crash if text isn't a number
-                System.out.println(number);
                 intent.putExtra("proximityThreshold", number);
                 System.out.println(intent.getIntExtra("proximityThreshold", 0));
             } catch (NumberFormatException e) {
@@ -319,9 +389,20 @@ public final class NewGameActivity extends AppCompatActivity {
             intent.putExtra("areaSouth", bounds.southwest.latitude);
             intent.putExtra("areaWest", bounds.southwest.longitude);
         }
-        startActivity(intent);
-        finish();
+        //startActivity(intent);
+        //finish();
         // Complete this function so that it populates the Intent with the user's settings (using putExtra)
         // If the user has set all necessary settings, launch the GameActivity and finish this activity
+        WebApi.startRequest(this, WebApi.API_BASE + "/games/create", Request.Method.POST, gameCreation, response -> {
+            intent.putExtra("game", response.get("game").getAsString());
+            startActivity(intent);
+            finish();
+            // Code in this handler will run when the request completes successfully
+            // Do something with the response?
+        }, error -> {
+            // Code in this handler will run if the request fails
+            // Maybe notify the user of the error?
+                Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show();
+            });
     }
 }

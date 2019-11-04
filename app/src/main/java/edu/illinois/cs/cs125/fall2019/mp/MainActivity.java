@@ -136,8 +136,6 @@ public final class MainActivity extends AppCompatActivity {
                                                 System.out.println("An Error has Occurred.")
                                         // Code in this handler will run if the request fails
                                         // Maybe notify the user of the error?
-
-
                                 ));
 
                                 parentinvitations.addView(invitationsChunk);
