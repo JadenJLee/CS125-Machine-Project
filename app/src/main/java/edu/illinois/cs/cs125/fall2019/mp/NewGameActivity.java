@@ -8,10 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +49,11 @@ public final class NewGameActivity extends AppCompatActivity {
      * List of Markers for the various targets.
      */
     private List<Marker> targets = new ArrayList<>();
+
+    /**
+     * List of invitees invited to a certain game.
+     */
+    private List<Invitee> invitees = new ArrayList<>();;
 
     /**
      * Called by the Android system when the activity is created.
@@ -101,6 +110,12 @@ public final class NewGameActivity extends AppCompatActivity {
             });
         });
 
+        Invitee user = new Invitee(FirebaseAuth.getInstance().getCurrentUser().getEmail(), TeamID.OBSERVER);
+        invitees.add(user);
+        updatePlayersUI();
+        System.out.println(user);
+        System.out.println(invitees.get(0));
+
         /*
          * Setting an ID for a control in the UI designer produces a constant on R.id
          * that can be passed to findViewById to get a reference to that control.
@@ -147,7 +162,80 @@ public final class NewGameActivity extends AppCompatActivity {
             // checkedId is the R.id constant of the currently checked RadioButton
             // Your code here: make only the selected mode's settings group visible
         });
+        Button addButton = findViewById(R.id.addInvitee);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                addInvitee();
+                // Code here executes on main thread after user presses button
+            }
+        });
     }
+
+    private void updatePlayersUI() {
+        LinearLayout playersLayout = findViewById(R.id.playersList);
+        playersLayout.removeAllViews();
+        for (Invitee player : invitees) {
+            View playersChunk = getLayoutInflater().inflate(
+                    R.layout.chunk_invitee, playersLayout, false);
+            TextView emailLabel = playersChunk.findViewById(R.id.inviteeEmail);
+            Spinner inviteesTeam = playersChunk.findViewById(R.id.inviteeTeam);
+            Button removeButton = playersChunk.findViewById(R.id.removeInvitee);
+
+            emailLabel.setText(player.getEmail());
+
+            inviteesTeam.setSelection(player.getTeamId());
+
+            if (player.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
+                removeButton.setVisibility(View.GONE);
+            }
+
+            inviteesTeam.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(final AdapterView<?> parent, final View view,
+                                           final int position, final long id) {
+                    // Called when the user selects a different item in the dropdown
+                    // The position parameter is the selected index
+                    // The other parameters can be ignored
+                    player.setTeamId(position);
+                }
+                @Override
+                public void onNothingSelected(final AdapterView<?> parent) {
+                    // Called when the selection becomes empty
+                    // Not relevant to the MP - can be left blank
+                }
+            });
+            removeButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(final View v) {
+                    invitees.remove(player);
+                    updatePlayersUI();
+                    // Code here executes on main thread after user presses button
+                }
+            });
+            playersLayout.addView(playersChunk);
+        }
+    }
+    private boolean isEmpty(final TextView etText) {
+        return etText.getText().toString().trim().length() == 0;
+    }
+
+    private void addInvitee() {
+        TextView inviteeEmail = findViewById(R.id.newInviteeEmail);
+        String invitedEmail = inviteeEmail.getText().toString();
+
+        if (invitedEmail.length() != 0) {
+            Invitee newInvite = new Invitee(invitedEmail, TeamID.OBSERVER);
+            invitees.add(newInvite);
+            updatePlayersUI();
+            inviteeEmail.setText("");
+        }
+
+
+
+
+
+    }
+
+
 
     /**
      * Sets up the area sizing map with initial settings: centering on campustown.

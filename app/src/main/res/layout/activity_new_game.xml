@@ -79,13 +79,33 @@
                 android:ems="10"
                 android:inputType="number"
                 android:text="Click to set Proximity Threshold!" />
+
         </LinearLayout>
+
+        <EditText
+            android:id="@+id/newInviteeEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textEmailAddress" />
+
+        <Button
+            android:id="@+id/addInvitee"
+            android:layout_width="121dp"
+            android:layout_height="wrap_content"
+            android:text="Add" />
 
         <Button
             android:id="@+id/createGame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Create Game!" />
+
+        <LinearLayout
+            android:id="@+id/playersList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"></LinearLayout>
 
     </LinearLayout>
 </edu.illinois.cs.cs125.fall2019.mp.MapEnabledScrollView>
