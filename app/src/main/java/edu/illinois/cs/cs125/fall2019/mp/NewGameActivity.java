@@ -1,5 +1,7 @@
 package edu.illinois.cs.cs125.fall2019.mp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 
@@ -12,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -27,6 +30,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -122,8 +126,6 @@ public final class NewGameActivity extends AppCompatActivity {
         Invitee user = new Invitee(FirebaseAuth.getInstance().getCurrentUser().getEmail(), TeamID.OBSERVER);
         invitees.add(user);
         updatePlayersUI();
-        System.out.println(user);
-        System.out.println(invitees.get(0));
 
         /*
          * Setting an ID for a control in the UI designer produces a constant on R.id
@@ -176,6 +178,13 @@ public final class NewGameActivity extends AppCompatActivity {
             public void onClick(final View v) {
                 addInvitee();
                 // Code here executes on main thread after user presses button
+            }
+        });
+
+        Button presetsButton = findViewById(R.id.loadPresetTargets);
+        presetsButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                getThePresets();
             }
         });
     }
@@ -405,4 +414,61 @@ public final class NewGameActivity extends AppCompatActivity {
                 Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show();
             });
     }
+
+    /**
+     * making a request to get the presets.
+     */
+    public void getThePresets() {
+        WebApi.startRequest(this, WebApi.API_BASE + "/presets", response -> {
+            View presetsChunk = getLayoutInflater().inflate(R.layout.chunk_presets_list, null, false);
+            RadioGroup presetOptions = presetsChunk.findViewById(R.id.presetOptions);
+            JsonArray jsonPresets = response.get("presets").getAsJsonArray();
+            AlertDialog.Builder a = new AlertDialog.Builder(this);
+
+            //start the counter at -1
+            int counter = -1;
+
+            // iterate through JsonArray of Presets
+            for (JsonElement presetThing: jsonPresets) {
+                JsonObject jsonObPreset = presetThing.getAsJsonObject();
+                String name = jsonObPreset.get("name").getAsString();
+                RadioButton rb = new RadioButton(this);
+
+                //move the counter up once.
+                counter++;
+
+                rb.setId(counter);
+                rb.setText(name);
+                presetOptions.addView(rb);
+                a.setView(presetsChunk);
+            }
+
+            // clear the targetMap as done in previous checkpoints.
+            targetMap.clear();
+
+            a.setPositiveButton("Load", new DialogInterface.OnClickListener() {
+                public void onClick(final DialogInterface dialog, final int id) {
+                        if (presetOptions.getCheckedRadioButtonId() != -1) {
+                            JsonObject o = jsonPresets.get(presetOptions.getCheckedRadioButtonId()).getAsJsonObject();
+                            JsonArray targetsArray = o.get("targets").getAsJsonArray();
+
+                            for (JsonElement presetTargets : targetsArray) {
+                                JsonObject presetTargetsJ = presetTargets.getAsJsonObject();
+                                LatLng latLngOfTargetPreset = new LatLng(presetTargetsJ.get("latitude").getAsDouble(),
+                                        presetTargetsJ.get("longitude").getAsDouble());
+                                MarkerOptions markerOptions = new MarkerOptions().position(latLngOfTargetPreset);
+                                targetMap.addMarker(markerOptions);
+                            }
+                        }
+                    }
+                });
+
+            a.setNegativeButton("Cancel", null);
+            a.show();
+
+            }, error -> {
+                Toast.makeText(this, "An Error has Occurred.", Toast.LENGTH_LONG).show();
+            });
+    }
+
 }
