@@ -465,10 +465,7 @@ public final class NewGameActivity extends AppCompatActivity {
 
             a.setNegativeButton("Cancel", null);
             a.show();
-
-            }, error -> {
-                Toast.makeText(this, "An Error has Occurred.", Toast.LENGTH_LONG).show();
-            });
+        }, error -> Toast.makeText(this, "An Error has Occurred.", Toast.LENGTH_LONG).show());
     }
 
 }
